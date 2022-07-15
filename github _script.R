@@ -75,7 +75,7 @@ wordcloud2(data=words, size=1.6, color='random-dark')
 #this one
 wordcloud2(data=words, size = 0.7, shape = 'pentagon')
 
-##maybe only republican and democrats and make two different clouds?
+
 #R E P U B L I C A N  - DESCRIPTIONS
 #republican wordcloud
 rep <- sentiment[which(sentiment$ideologies==1),]
