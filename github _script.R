@@ -1,4 +1,4 @@
-#load packages
+#'load packages
 library(igraph)
 library(tidyverse)
 library(rtweet)
@@ -13,23 +13,27 @@ library(tidytext)
 library(textdata)
 library(dplyr)
 
-#setup the apikey (to scrape twitter: developer> apps> pop_democracy > keys and tokens) 
+
+#' DATA COLLECTION
+#' This is how I collected Tweets during the 2020 US Presidential campaign.
+#' 
+#'setup the apikey (to scrape twitter: developer> apps> pop_democracy > keys and tokens) 
 api_key <- "xxx"
 api_secret_key <-  "xxx"
 
-#authenticate via web browser
+#' authenticate via web browser
 token <- create_token(
-  app= "pop-democracy",
+  app= "pop-democracy", # I created this application to create the API key which allows data extrapolation
   consumer_key = api_key,
   consumer_secret = api_secret_key,
   access_token = "xxx",
   access_secret= "xxx"
 )
 
-#or just run this
+#' or just run this to get the keys
 get_token()
 
-#search tweets by hashtags (some examples)
+#' search tweets by hashtags (some examples)
 debate <- search_tweets("#PresidentialDebate2020", n = 18000, include_rts = FALSE)
 elections <- search_tweets("#USA2020", n = 18000, include_rts = FALSE)
 elections_a <- search_tweets("#Usa2020",n = 18000, include_rts = FALSE)
@@ -38,22 +42,23 @@ vote <- search_tweets("#Vote", n = 18000, include_rts=FALSE)
 vote_a <- search_tweets("#vote", n = 18000, include_rts = FALSE)
 
 
-#save in RDS format
+#' save in RDS format
 debate <- saveRDS(debate,"debate.csv")
 
-#readRDS 
+
+#' readRDS 
 deb <- readRDS("debate.csv",refhook = NULL)
 
 
+#' 
+#' P A R T  - II - Data cleaning
+#' 
+#'  this is a simple way to remove weird emojis and characters
 
-#P A R T  - II - VISUALIZATION#
+c <- readtext("data.csv")
 
-#clean dataset - this is a simple way to remove weird emojis and characters
-setwd("C:/Users/fcogo/Desktop/project/")
-c <- readtext("final_classified_id.csv")
-
-list_weird_emojis <-c("@\\S*", "amp", "[\r\n]","[[:punct:]]","ðÿ","â","ð","ï","im","ã",
-                      "ÿ","œ", "š","ÿž","te", "ŸŽ")
+list_weird_emojis <-c("@\\S*", "amp", "[\r\n]","[[:punct:]]","Ã°Ã¿","Ã¢","Ã°","Ã¯","im","Ã£",
+                      "Ã¿","Å", "Å¡","Ã¿Å¾","te", "Å¸Å½")
 
 c$cleaned_text <- gsub("https\\S*", "", c$stripped_text) 
 for (variable in list_weird_emojis){
@@ -70,13 +75,16 @@ words <- tweets_words %>%
   count(word, sort=TRUE)
 words <- words[-1,]
 
+#' In this case, it is appropriate to show word clouds and what stood out from the tweets
+#' WORDCLOUDS
+
 #cloud
 wordcloud2(data=words, size=1.6, color='random-dark')
 #this one
 wordcloud2(data=words, size = 0.7, shape = 'pentagon')
 
 
-#R E P U B L I C A N  - DESCRIPTIONS
+#' R E P U B L I C A N  - DESCRIPTIONS
 #republican wordcloud
 rep <- sentiment[which(sentiment$ideologies==1),]
 #preprocessing
@@ -91,7 +99,7 @@ words_rep <- words_rep[-1,]
 #cloud
 wordcloud2(data=words_rep, size = 0.7, shape = 'pentagon')
 
-#D E M O C R A T S  - DESCRIPTIONS
+#' D E M O C R A T S  - DESCRIPTIONS
 dem <- sentiment[which(sentiment$ideologies==2),]
 #preprocessing
 tweets_dem <-  dem %>%
@@ -107,7 +115,7 @@ wordcloud2(data=words_dem, size = 0.7, shape = 'pentagon')
 
 
 
-## SENTIMENT ANALYSIS ##
+#' Sentiment Analysis created with tidytext
 
 #import dictionary
 dictionary <-  get_sentiments("bing")
@@ -159,34 +167,3 @@ words_rep <- tweets_rep %>%
 #word-cloud
 wordcloud2(data=words_rep, size = 0.7, shape = 'pentagon')
 rm(tweets_rep)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
